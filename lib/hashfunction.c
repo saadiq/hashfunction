@@ -28,6 +28,11 @@
 
 #include <ruby.h>
 
+#if !defined(RSTRING_LEN) 
+# define RSTRING_LEN(x) (RSTRING(x)->len) 
+# define RSTRING_PTR(x) (RSTRING(x)->ptr) 
+#endif
+
 static VALUE HashFunction;
 static VALUE Lookup3;
 
@@ -41,7 +46,7 @@ static VALUE
 t_hashlittle(VALUE self, VALUE key, VALUE initval)
 {
     VALUE str = StringValue(key);
-    VALUE val = hashlittle(RSTRING(str)->ptr, RSTRING(str)->len, NUM2UINT(initval));
+    VALUE val = hashlittle(RSTRING_PTR(str), RSTRING_LEN(str), NUM2UINT(initval));
 	return UINT2NUM(val);
 }
 
@@ -67,13 +72,13 @@ t_hashlittle2(VALUE self, VALUE key, VALUE initvals, VALUE hashvalues)
 {
     VALUE str = StringValue(key);
 
-	unsigned int h0 = NUM2UINT(RARRAY(initvals)->ptr[0]);
-	unsigned int h1 = NUM2UINT(RARRAY(initvals)->ptr[1]);
+	unsigned int h0 = NUM2UINT(RARRAY_PTR(initvals)[0]);
+	unsigned int h1 = NUM2UINT(RARRAY_PTR(initvals)[1]);
 
-    hashlittle2(RSTRING(str)->ptr, RSTRING(str)->len, &h0, &h1);
+    hashlittle2(RSTRING_PTR(str), RSTRING_LEN(str), &h0, &h1);
 
-	RARRAY(hashvalues)->ptr[0] = UINT2NUM(h0);
-	RARRAY(hashvalues)->ptr[1] = UINT2NUM(h1);
+	RARRAY_PTR(hashvalues)[0] = UINT2NUM(h0);
+	RARRAY_PTR(hashvalues)[1] = UINT2NUM(h1);
     return Qnil;
 }
 
